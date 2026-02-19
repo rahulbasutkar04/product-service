@@ -1,0 +1,62 @@
+#Analysis
+
+Product Service – Initial Analysis
+
+Basic Idea / Project Goal:
+
+The main objective of this project is to implement CRUD operations on the Product domain.
+Role-based access control needs to be implemented so that only ADMIN users can create, update, or delete products, whereas normal USER roles can only view the available products.
+Buying or ordering functionality is intentionally excluded from this assignment scope following the YAGNI (You Aren’t Gonna Need It) principle.
+
+---
+
+Domain Analysis:
+
+Product Entity:
+
+The Product entity represents the items managed in the system.
+
+Fields required:
+
+* id (Integer) – Primary key for product table
+* productName (String) – Name of the product
+* productQuantity (Integer) – Quantity available
+* availability (Boolean) – Indicates whether the product is available. Since it is a primitive boolean, the default value will be false
+* createdAt (DateTime) – Timestamp when the product is created
+* modifiedAt (DateTime) – Timestamp when the product is last updated
+* createdBy (String) – Stores which user created the product
+* modifiedBy (String) – Stores which user modified the product
+
+Assumption: createdBy and modifiedBy fields are required for auditing purposes to track who has added or updated the data in the database.
+
+---
+
+User Entity:
+
+The User entity represents registered users of the system.
+
+Fields required:
+
+* id (Integer) – Primary key for user table
+* name (String) – Name of the user
+* email (String) – Email address used for login
+* contact (String) – Contact number
+* role (Enum) – USER or ADMIN
+* password (String) – Hashed password stored securely in the database
+* createdAt (DateTime) – Timestamp when the user is created
+* modifiedAt (DateTime) – Timestamp when the user is last updated
+
+---
+
+Business Logic / System Actions:
+
+* A user can register into the system by providing the required details.
+* Registered users can update their own profile information.
+* Users can belong to either USER or ADMIN role.
+* Separate APIs will be provided for USER and ADMIN functionalities.
+* JWT-based authentication will be used to secure the APIs.
+* Role-based authorization will ensure that:
+
+  * ADMIN users can create, update, and delete products.
+  * USER roles can only view the list of products and product details.
+
