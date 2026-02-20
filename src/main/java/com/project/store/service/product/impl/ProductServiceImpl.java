@@ -19,6 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author rahul
+ * Service Class for {@link Product}
+ */
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -27,27 +31,29 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    /**
+     * Create new Product [ADMIN]
+     *
+     * @param productRequest {@link ProductRequest}
+     * @param createdBy      {@link String}
+     * @return {@link ProductResponse}
+     */
     @Override
     public ProductResponse createProductService(ProductRequest productRequest,
                                                 String createdBy) {
 
         try {
 
-            //  Duplicate Check
-            boolean productExists =
-                    productRepository.existsByProductNameAndCategory(
-                            productRequest.getProductName(),
-                            productRequest.getCategory());
+            // Duplicate check
+            boolean productExists = productRepository.existsByProductNameAndCategory(
+                    productRequest.getProductName(),
+                    productRequest.getCategory());
 
             if (productExists) {
-
                 throw new ValidationException(
                         new ValidationError(
                                 "Product already exists in this category",
-                                ValidationErrorType.INVALID_REQUEST.getErrorType()
-                        ),
-                        ErrorResponseEnum.DUPLICATE_REQUEST
-                );
+                                ValidationErrorType.INVALID_REQUEST.getErrorType()), ErrorResponseEnum.DUPLICATE_REQUEST);
             }
 
             //  Business Logic: Availability depends on quantity
@@ -65,6 +71,7 @@ public class ProductServiceImpl implements ProductService {
                     .modifiedBy(createdBy)
                     .build();
 
+            // Save
             Product savedProduct = productRepository.save(product);
 
             return ProductResponse.buildProductResponseForAdmin(savedProduct);
@@ -73,17 +80,21 @@ public class ProductServiceImpl implements ProductService {
             throw validationException;
 
         } catch (Exception exception) {
-
             throw new ValidationException(
                     new ValidationError(
                             "Failed to create product",
-                            ValidationErrorType.UNPROCESSABLE.getErrorType()
-                    ),
-                    ErrorResponseEnum.UNPROCESSABLE_ENTITY
-            );
+                            ValidationErrorType.UNPROCESSABLE.getErrorType()), ErrorResponseEnum.UNPROCESSABLE_ENTITY);
         }
     }
 
+    /**
+     * Update Product [ADMIN]
+     *
+     * @param id         {@link Product}_id
+     * @param request    {@link ProductRequest}
+     * @param modifiedBy {@link String}
+     * @return {@link ProductResponse}
+     */
     @Override
     public ProductResponse updateProductService(Integer id,
                                                 ProductUpdateRequest request,
@@ -95,13 +106,9 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() -> new ValidationException(
                             new ValidationError(
                                     "Product not found",
-                                    ValidationErrorType.INVALID_REQUEST.getErrorType()
-                            ),
-                            ErrorResponseEnum.ENTITY_NOT_FOUND
-                    ));
+                                    ValidationErrorType.INVALID_REQUEST.getErrorType()), ErrorResponseEnum.ENTITY_NOT_FOUND));
 
             //  Update only if field is present
-
             if (request.getProductName() != null) {
                 product.setProductName(request.getProductName());
             }
@@ -135,13 +142,16 @@ public class ProductServiceImpl implements ProductService {
             throw new ValidationException(
                     new ValidationError(
                             "Failed to update product",
-                            ValidationErrorType.UNPROCESSABLE.getErrorType()
-                    ),
-                    ErrorResponseEnum.UNPROCESSABLE_ENTITY
-            );
+                            ValidationErrorType.UNPROCESSABLE.getErrorType()), ErrorResponseEnum.UNPROCESSABLE_ENTITY);
         }
     }
 
+    /**
+     * Get Product By Id  [ADMIN]
+     *
+     * @param productId {@link Product}_id
+     * @return {@link ProductResponse}
+     */
     @Override
     public ProductResponse getProductByIdService(Integer productId) {
 
@@ -151,22 +161,17 @@ public class ProductServiceImpl implements ProductService {
                 throw new ValidationException(
                         new ValidationError(
                                 "'productId' can not be empty or null",
-                                ValidationErrorType.REQUIRED_FIELD_MISSING.getErrorType()
-                        ),
-                        ErrorResponseEnum.UNPROCESSABLE_ENTITY
-                );
+                                ValidationErrorType.REQUIRED_FIELD_MISSING.getErrorType()), ErrorResponseEnum.UNPROCESSABLE_ENTITY);
             }
 
             Product product = productRepository.findById(Long.valueOf(productId))
                     .orElseThrow(() -> new ValidationException(
                             new ValidationError(
                                     "Product not found",
-                                    ValidationErrorType.INVALID_REQUEST.getErrorType()
-                            ),
-                            ErrorResponseEnum.ENTITY_NOT_FOUND
-                    ));
+                                    ValidationErrorType.INVALID_REQUEST.getErrorType()), ErrorResponseEnum.ENTITY_NOT_FOUND));
 
             return ProductResponse.buildProductResponseForAdmin(product);
+
         } catch (ValidationException validationException) {
             throw validationException;
         } catch (Exception exception) {
@@ -175,11 +180,17 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    /**
+     * Get all by product in page with optional filter  [ADMIN]
+     *
+     * @param category {@link Category}
+     * @param pageable {@link Pageable}
+     * @return {@link Page<ProductResponse>}
+     */
     @Override
     public Page <ProductResponse> getAllProductsService(Category category, Pageable pageable) {
 
         try {
-
 
             Page <Product> productPage;
 
@@ -196,13 +207,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    /**
+     * Get all by product in page with optional filter [USER]
+     *
+     * @param category {@link Category}
+     * @param pageable {@link Pageable}
+     * @return {@link Page<ProductResponseConsumer>}
+     */
     @Override
     public Page <ProductResponseConsumer> getAvailableProductsService(
             Category category,
             Pageable pageable) {
 
         try {
-
 
             Page <Product> productPage;
 
@@ -220,8 +237,7 @@ public class ProductServiceImpl implements ProductService {
                             .productName(product.getProductName())
                             .productQuantity(product.getProductQuantity())
                             .category(product.getCategory())
-                            .build()
-            );
+                            .build());
 
         } catch (Exception exception) {
             throw exception;

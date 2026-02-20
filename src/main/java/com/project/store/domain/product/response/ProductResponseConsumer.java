@@ -5,6 +5,9 @@ import com.project.store.domain.product.Category;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Response POJO for {@link com.project.store.domain.product.Product} for USER
+ */
 @Data
 @Builder
 public class ProductResponseConsumer {

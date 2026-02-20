@@ -16,6 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author rahul
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -28,6 +31,12 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
 
+    /**
+     * Login User  [ADMIN & USER]
+     *
+     * @param authRequest {@link AuthRequest}
+     * @return {@link AuthResponse}
+     */
     public AuthResponse loginService(AuthRequest authRequest) {
 
         try {

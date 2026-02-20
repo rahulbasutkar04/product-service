@@ -42,11 +42,5 @@ public class ValidationException extends ApplicationException{
         super(errorResponse, throwable);
         this.validationError = validationError;
     }
-    // Only for WebClient errors
-    public ValidationException(ValidationError validationError, ErrorResponseEnum errorResponse,
-                               Integer statusCode, Throwable throwable) {
-        super(errorResponse, statusCode, throwable);
-        this.validationError = validationError;
-    }
 
 }

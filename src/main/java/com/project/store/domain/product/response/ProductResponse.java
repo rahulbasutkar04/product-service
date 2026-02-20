@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * Response Pojo For {@link Product}
+ */
 @Data
 @Builder
 public class ProductResponse {

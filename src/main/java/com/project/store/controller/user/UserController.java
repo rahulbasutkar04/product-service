@@ -11,6 +11,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * @author rahul
+ * User Controlller
+ */
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -20,6 +24,12 @@ public class UserController {
     private UserService userService;
 
 
+    /**
+     * Register User
+     *
+     * @param userRequest {@link UserRequest}
+     * @return {@link UserResponse}
+     */
     @PostMapping("/register/opn")
     public ResponseEntity <UserResponse> register(@Valid @RequestBody UserRequest userRequest) {
 
@@ -28,18 +38,23 @@ public class UserController {
         return new ResponseEntity <>(userResponse, HttpStatus.CREATED);
     }
 
+    /**
+     * Get User Profile [USER]
+     *
+     * @param authentication {@link Authentication}
+     * @return {@link UserResponse}
+     */
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/myProfile/secure")
-    public ResponseEntity<UserResponse> getMyProfile(Authentication authentication)
-    {
+    public ResponseEntity <UserResponse> getMyProfile(Authentication authentication) {
 
         if (authentication != null || authentication.isAuthenticated()) {
 
-           String email= authentication.getName();
+            String email = authentication.getName();
 
-          UserResponse userResponse= userService.getUserByEmailIdService(email);
+            UserResponse userResponse = userService.getUserByEmailIdService(email);
 
-          return new ResponseEntity <>(userResponse,HttpStatus.OK);
+            return new ResponseEntity <>(userResponse, HttpStatus.OK);
         }
 
         return new ResponseEntity <>(HttpStatus.UNAUTHORIZED);

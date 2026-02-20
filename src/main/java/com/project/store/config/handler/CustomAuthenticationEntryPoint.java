@@ -1,6 +1,5 @@
 package com.project.store.config.handler;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
@@ -10,6 +9,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.io.IOException;
 
+/**
+ * @author rahul
+ * Custom Authorization Check Handler
+ */
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
@@ -26,11 +29,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             response.setContentType("application/json");
 
             response.getWriter().write("""
-                {
-                    "message": "Invalid input provided",
-                    "status": 400
-                }
-                """);
+                    {
+                        "message": "Invalid input provided",
+                        "status": 400
+                    }
+                    """);
 
             return;
         }
@@ -39,11 +42,11 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json");
 
         response.getWriter().write("""
-            {
-                "message": "User is not authenticated",
-                "status": 401
-            }
-            """);
+                {
+                    "message": "User is not authenticated",
+                    "status": 401
+                }
+                """);
     }
 
 }

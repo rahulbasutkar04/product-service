@@ -8,6 +8,9 @@ import com.project.store.domain.product.response.ProductResponseConsumer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+/**
+ * @author rahul
+ */
 public interface ProductService {
 
     ProductResponse createProductService(ProductRequest productRequest, String createdBy);

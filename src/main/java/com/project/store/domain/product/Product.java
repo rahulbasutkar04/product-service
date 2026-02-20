@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Entity class for Product
+ */
 @Data
 @Entity
 @Table(name = "product")
@@ -16,9 +19,25 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Product {
 
+    // default value = false for primitive boolean
+    private boolean availability;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private String createdBy;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    private LocalDateTime modifiedAt;
+
+    private String modifiedBy;
 
     @Column(nullable = false)
     private String productName;
@@ -26,31 +45,18 @@ public class Product {
     @Column(nullable = false)
     private Integer productQuantity;
 
-    // default value = false for primitive boolean
-    private boolean availability;
-
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime modifiedAt;
-
-    private String createdBy;
-
-    private String modifiedBy;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Category category;
-
     // Automatically set timestamps
     @PrePersist
     public void onCreate() {
+
         this.createdAt = LocalDateTime.now();
         this.modifiedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void onUpdate() {
+
         this.modifiedAt = LocalDateTime.now();
     }
+
 }

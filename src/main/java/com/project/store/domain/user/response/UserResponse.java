@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Response POJO {@link User}
+ */
 @Data
 @Getter
 @Setter
@@ -22,6 +25,12 @@ public class UserResponse {
     private UserRole role;
 
 
+    /**
+     * UserResponse Builder
+     *
+     * @param user {@link User}
+     * @return {@link UserResponse}
+     */
     public static UserResponse buildUserResponseFromUserEntity(User user) {
 
         return UserResponse.builder()

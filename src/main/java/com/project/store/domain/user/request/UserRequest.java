@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Request POJO {@link com.project.store.domain.user.User}
+ */
 @Getter
 @Setter
 @Data

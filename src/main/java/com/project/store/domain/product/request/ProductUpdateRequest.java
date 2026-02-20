@@ -4,6 +4,9 @@ import com.project.store.domain.product.Category;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 
+/**
+ * Request pojo to update Product {@link com.project.store.domain.product.Product}
+ */
 @Data
 public class ProductUpdateRequest {
 

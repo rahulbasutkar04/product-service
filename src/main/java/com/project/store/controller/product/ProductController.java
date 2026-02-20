@@ -15,6 +15,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * @author rahul
+ * Product Controller
+ */
 @RestController
 @RequestMapping("/product")
 public class ProductController {
@@ -23,16 +27,23 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    /**
+     * API to create Product [ADMIN]
+     *
+     * @param authentication {@link Authentication}
+     * @param productRequest {@link ProductRequest}
+     * @return {@link ProductResponse}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create/secure")
-    public ResponseEntity<ProductResponse> createProduct(Authentication authentication,
-                                                         @RequestBody ProductRequest productRequest){
+    public ResponseEntity <ProductResponse> createProduct(Authentication authentication,
+                                                          @RequestBody ProductRequest productRequest) {
 
         if (authentication != null || authentication.isAuthenticated()) {
 
-            String email= authentication.getName();
+            String email = authentication.getName();
 
-           ProductResponse productResponse= productService.createProductService(productRequest,email);
+            ProductResponse productResponse = productService.createProductService(productRequest, email);
 
             return new ResponseEntity <>(productResponse, HttpStatus.OK);
         }
@@ -40,9 +51,17 @@ public class ProductController {
         return new ResponseEntity <>(HttpStatus.UNAUTHORIZED);
     }
 
+    /**
+     * API to update Product details [ADMIN]
+     *
+     * @param id             {@link Integer}
+     * @param authentication {@link Authentication}
+     * @param updateRequest  {@link ProductUpdateRequest}
+     * @return {@link ProductResponse}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}/secure")
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity <ProductResponse> updateProduct(
             @PathVariable Integer id,
             Authentication authentication,
             @RequestBody ProductUpdateRequest updateRequest) {
@@ -55,9 +74,15 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Get Product By Id [ADMIN]
+     *
+     * @param id {@link Integer}
+     * @return {@link ProductResponse}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}/secure")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Integer id) {
+    public ResponseEntity <ProductResponse> getProductById(@PathVariable Integer id) {
 
         ProductResponse response = productService.getProductByIdService(id);
 
@@ -65,26 +90,40 @@ public class ProductController {
     }
 
 
+    /**
+     * Fetch all Products by pagination and optional filter by category  [ADMIN]
+     *
+     * @param category {@link Category}
+     * @param pageable {@link Pageable}
+     * @return {@link Page<ProductResponse>}
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/page/secure")
-    public ResponseEntity<Page<ProductResponse>> getProducts(
+    public ResponseEntity <Page <ProductResponse>> getProducts(
             @RequestParam(required = false) Category category,
             Pageable pageable) {
 
-        Page<ProductResponse> response =
+        Page <ProductResponse> response =
                 productService.getAllProductsService(category, pageable);
 
         return ResponseEntity.ok(response);
     }
 
 
+    /**
+     * Fetch all Products by pagination and optional filter by category  [USER]
+     *
+     * @param category {@link Category}
+     * @param pageable {@link Pageable}
+     * @return {@link Pageable<ProductResponseConsumer>}
+     */
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/consumer/secure")
-    public ResponseEntity<Page<ProductResponseConsumer>> getAvailableProducts(
+    public ResponseEntity <Page <ProductResponseConsumer>> getAvailableProducts(
             @RequestParam(required = false) Category category,
             Pageable pageable) {
 
-        Page<ProductResponseConsumer> response =
+        Page <ProductResponseConsumer> response =
                 productService.getAvailableProductsService(category, pageable);
 
         return ResponseEntity.ok(response);

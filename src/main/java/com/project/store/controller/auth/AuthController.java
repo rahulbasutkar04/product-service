@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @author rahul
+ * Authentication controller
+ */
 @RequestMapping("/auth")
 @RestController
 public class AuthController {
@@ -19,7 +23,7 @@ public class AuthController {
 
 
     @PostMapping("/login/opn")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity <AuthResponse> login(@RequestBody AuthRequest authRequest) {
 
         AuthResponse response = authService.loginService(authRequest);
 

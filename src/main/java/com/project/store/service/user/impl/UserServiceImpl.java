@@ -20,11 +20,14 @@ import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
+/**
+ * @author rahul
+ */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private static final Logger LOG= LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
 
     private final UserRepository userRepository;
@@ -32,6 +35,12 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
 
+    /**
+     * Create Admin User   [ADMIN]
+     *
+     * @param userRequest {@link UserRequest}
+     * @return {@link UserResponse}
+     */
     @Override
     public UserResponse createAdminUserService(UserRequest userRequest) {
 
@@ -43,10 +52,7 @@ public class UserServiceImpl implements UserService {
                 throw new ValidationException(
                         new ValidationError(
                                 "User already exists. Abort!",
-                                ValidationErrorType.INVALID_REQUEST.getErrorType()
-                        ),
-                        ErrorResponseEnum.USER_CONFLICT
-                );
+                                ValidationErrorType.INVALID_REQUEST.getErrorType()), ErrorResponseEnum.USER_CONFLICT);
             }
 
             User user = User.builder()
@@ -68,30 +74,30 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException(
                     new ValidationError(
                             "Failed to register Admin User, please contact administrator!",
-                            ValidationErrorType.UNPROCESSABLE.getErrorType()
-                    ),
-                    ErrorResponseEnum.UNPROCESSABLE_ENTITY
-            );
+                            ValidationErrorType.UNPROCESSABLE.getErrorType()), ErrorResponseEnum.UNPROCESSABLE_ENTITY);
         }
     }
 
 
+    /**
+     * Create Consumer User   [USER]
+     *
+     * @param userRequest {@link UserRequest}
+     * @return {@link UserResponse}
+     */
     @Override
     public UserResponse createUserService(UserRequest userRequest) {
 
         try {
 
             // Step 1 — Check if user already exists
-            Optional<User> existingUser = userRepository.findByEmail(userRequest.getEmail());
+            Optional <User> existingUser = userRepository.findByEmail(userRequest.getEmail());
 
             if (existingUser.isPresent()) {
                 throw new ValidationException(
                         new ValidationError(
                                 "User already exists. Abort!",
-                                ValidationErrorType.INVALID_REQUEST.getErrorType()
-                        ),
-                        ErrorResponseEnum.USER_CONFLICT
-                );
+                                ValidationErrorType.INVALID_REQUEST.getErrorType()), ErrorResponseEnum.USER_CONFLICT);
             }
 
             // Step 2 — Create User
@@ -123,6 +129,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Get user by emailId    [USER]
+     *
+     * @param email {@link String}
+     * @return {@link UserResponse}
+     */
     @Override
     public UserResponse getUserByEmailIdService(String email) {
 

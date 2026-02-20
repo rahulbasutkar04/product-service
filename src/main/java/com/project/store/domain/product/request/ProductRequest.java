@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+/**
+ * Request Pojo {@link com.project.store.domain.product.Product}
+ */
 @Data
 public class ProductRequest {
 

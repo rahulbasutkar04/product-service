@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * @author rahul
+ */
 @Component
 public class JwtUtil {
 
@@ -20,7 +23,7 @@ public class JwtUtil {
 
     public String generateToken(UserDetails userDetails) {
 
-        Map<String, Object> claims = new HashMap<>();
+        Map <String, Object> claims = new HashMap <>();
 
         return createToken(
                 claims,
@@ -29,7 +32,7 @@ public class JwtUtil {
         );
     }
 
-    private String createToken(Map<String, Object> claims,
+    private String createToken(Map <String, Object> claims,
                                String email,
                                long expiry) {
 
@@ -83,7 +86,7 @@ public class JwtUtil {
 
     public String generateRefreshToken(UserDetails userDetails) {
 
-        Map<String, Object> claims = new HashMap<>();
+        Map <String, Object> claims = new HashMap <>();
 
         return createToken(
                 claims,
