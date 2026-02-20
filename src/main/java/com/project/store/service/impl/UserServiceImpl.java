@@ -61,6 +61,8 @@ public class UserServiceImpl implements UserService {
 
         } catch (DataAccessException ex) {
 
+            LOG.error("Error while creating admin user inside 'createAdminUserService'");
+
             throw new ValidationException(
                     new ValidationError(
                             "Failed to register Admin User, please contact administrator!",
@@ -106,6 +108,8 @@ public class UserServiceImpl implements UserService {
             return UserResponse.buildUserResponseFromUserEntity(savedUser);
 
         } catch (DataAccessException ex) {
+
+            LOG.error("Error while creating admin user inside 'createUserService'");
 
             throw new ValidationException(
                     new ValidationError(
