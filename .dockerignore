@@ -1,0 +1,32 @@
+# Build output (JAR is built inside container)
+build/
+
+# Gradle cache (wrapper is kept)
+.gradle/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Test and docs (not needed in image)
+src/test/
+*.md
+docs/
+
+# Docker
+Dockerfile*
+.dockerignore
+
+# Misc
+*.log
+.DS_Store
+.env
+.env.*
