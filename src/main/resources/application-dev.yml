@@ -17,3 +17,13 @@ jwt:
 admin:
   register:
     secret: mySuperSecretKey123
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha

@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author rahul
@@ -47,14 +48,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                        //  SWAGGER ENDPOINTS – permit by path prefix so /v3/api-docs and /v3/api-docs/swagger-config are allowed
+                        .requestMatchers(swaggerRequestMatcher()).permitAll()
+
                         // PUBLIC REGISTER APIs
-                        .requestMatchers("/**/register/opn",
+                        .requestMatchers(
+                                "/**/register/opn",
                                 "/auth/login/opn"
                         ).permitAll()
 
-                        //  Everything Else Secured
+                        // Everything Else Secured
                         .anyRequest().authenticated()
                 )
 
@@ -73,6 +79,21 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
+    }
+
+    /**
+     * Matcher for Swagger/OpenAPI docs and UI so they are always permitted (no 401 on fetch).
+     */
+    private static RequestMatcher swaggerRequestMatcher() {
+        return request -> {
+            String path = request.getRequestURI();
+            return path.startsWith("/v3/api-docs")
+                    || path.startsWith("/swagger-ui")
+                    || path.equals("/swagger-ui.html")
+                    || path.startsWith("/swagger-resources")
+                    || path.startsWith("/webjars")
+                    || path.startsWith("/configuration");
+        };
     }
 
     @Bean

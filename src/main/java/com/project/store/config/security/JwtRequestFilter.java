@@ -31,7 +31,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private static final List<String> PUBLIC_URLS = List.of(
             "/**/register/opn",
-            "/auth/login/opn"
+            "/auth/login/opn",
+
+            // SWAGGER URLS
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/webjars/**"
     );
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
@@ -44,14 +50,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-
-        String servletPath = request.getServletPath();
-
-        if (PUBLIC_URLS.stream().anyMatch(pattern -> pathMatcher.match(pattern, servletPath))) {
-            System.out.println("Skipping JWT filter for public URL: " + servletPath);
-            filterChain.doFilter(request, response);
-            return;
-        }
 
 
         String jwt = null;
@@ -98,6 +96,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
 
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+
+        String path = request.getRequestURI();
+
+        return path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/swagger-resources")
+                || path.startsWith("/swagger-ui.html")
+                || path.startsWith("/webjars")
+                || path.startsWith("/configuration")
+                || path.startsWith("/swagger")
+                || path.contains("/register/opn")
+                || path.contains("/login/opn");
     }
 
 }
