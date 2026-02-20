@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * Product Controller
  */
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/api/v1/product")
 public class ProductController {
 
 
@@ -35,7 +35,7 @@ public class ProductController {
      * @return {@link ProductResponse}
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create/secure")
+    @PostMapping("/secure")
     public ResponseEntity <ProductResponse> createProduct(Authentication authentication,
                                                           @RequestBody ProductRequest productRequest) {
 
@@ -60,7 +60,7 @@ public class ProductController {
      * @return {@link ProductResponse}
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/update/{id}/secure")
+    @PutMapping("/{id}/secure")
     public ResponseEntity <ProductResponse> updateProduct(
             @PathVariable Integer id,
             Authentication authentication,
@@ -109,6 +109,27 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+
+    /**
+     * Soft Delete Product (Make unavailable) [ADMIN]
+     *
+     * @param id {@link Integer}
+     * @param authentication {@link Authentication}
+     * @return {@link ProductResponse}
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}/secure")
+    public ResponseEntity<String> deleteProduct(
+            @PathVariable Integer id,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        String response =
+                productService.deleteProductService(id, email);
+
+        return ResponseEntity.ok(response);
+    }
 
     /**
      * Fetch all Products by pagination and optional filter by category  [USER]

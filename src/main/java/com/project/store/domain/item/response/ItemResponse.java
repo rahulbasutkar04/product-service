@@ -1,5 +1,6 @@
 package com.project.store.domain.item.response;
 
+import com.project.store.domain.item.Item;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,7 +8,7 @@ import lombok.Data;
  * @author rahul
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class ItemResponse {
 
     private Integer itemId;
@@ -18,4 +19,14 @@ public class ItemResponse {
 
     private Integer quantity;
 
+
+    public static ItemResponse buildItemResponse(Item item)
+    {
+       return ItemResponse.builder()
+               .itemId(item.getId())
+               .productId(item.getProduct().getId())
+               .productName(item.getProduct().getProductName())
+               .quantity(item.getQuantity())
+               .build();
+    }
 }

@@ -102,6 +102,13 @@ public class ProductServiceImpl implements ProductService {
 
         try {
 
+            if (id == null) {
+                throw new ValidationException(
+                        new ValidationError(
+                                "'id' can not be empty or null",
+                                ValidationErrorType.REQUIRED_FIELD_MISSING.getErrorType()), ErrorResponseEnum.UNPROCESSABLE_ENTITY);
+            }
+
             Product product = productRepository.findById(Long.valueOf(id))
                     .orElseThrow(() -> new ValidationException(
                             new ValidationError(
@@ -240,6 +247,38 @@ public class ProductServiceImpl implements ProductService {
                             .build());
 
         } catch (Exception exception) {
+            throw exception;
+        }
+    }
+
+    @Override
+    public String deleteProductService(Integer productId, String deletedBy) {
+        try{
+
+            Product product = productRepository.findById(Long.valueOf(productId))
+                    .orElseThrow(() -> new ValidationException(
+                            new ValidationError(
+                                    "Product not found",
+                                    ValidationErrorType.INVALID_REQUEST.getErrorType()), ErrorResponseEnum.ENTITY_NOT_FOUND));
+
+            if (!product.isAvailability()) {
+                throw new ValidationException(
+                        new ValidationError(
+                                "Product already deleted",
+                                ValidationErrorType.INVALID_REQUEST.getErrorType()),ErrorResponseEnum.INVALID_REQUEST);
+            }
+
+            product.setAvailability(false);
+
+
+            return "Product Deleted Succesfully";
+
+
+        }catch (ValidationException validationException)
+        {
+            throw validationException;
+        }catch (Exception exception)
+        {
             throw exception;
         }
     }

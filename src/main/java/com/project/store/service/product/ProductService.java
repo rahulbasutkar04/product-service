@@ -23,4 +23,6 @@ public interface ProductService {
 
     Page<ProductResponseConsumer> getAvailableProductsService(Category category, Pageable pageable);
 
+    String deleteProductService(Integer productId, String deletedBy);
+
 }
