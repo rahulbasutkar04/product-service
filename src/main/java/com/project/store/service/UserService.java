@@ -9,4 +9,7 @@ public interface UserService {
     UserResponse createAdminUserService(UserRequest userRequest);
 
     UserResponse createUserService(UserRequest userRequest);
+
+    UserResponse getUserByEmailIdService(String email);
+
 }

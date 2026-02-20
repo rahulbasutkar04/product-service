@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -122,6 +123,38 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public UserResponse getUserByEmailIdService(String email) {
+
+        try {
+            if (! StringUtils.hasLength(email)) {
+                throw new ValidationException(ValidationError.builder()
+                        .errorMessage("Email can not be empty or null, abort!")
+                        .build(), ErrorResponseEnum.VALIDATION_ERROR);
+            }
+
+            Optional <User> existingUser = userRepository.findByEmail(email);
+
+            if (existingUser.isEmpty() || existingUser == null) {
+                throw new ValidationException(
+                        new ValidationError(
+                                "User Not found, Abort!",
+                                ValidationErrorType.INVALID_REQUEST.getErrorType()
+                        ),
+                        ErrorResponseEnum.UNPROCESSABLE_ENTITY
+                );
+            }
+
+            return UserResponse.buildUserResponseFromUserEntity(existingUser.get());
+
+        } catch (ValidationException validationException) {
+            throw validationException;
+        } catch (Exception e) {
+
+            LOG.error("Unable to fetch user inside 'getUserByEmailIdService', abort!");
+            throw e;
+        }
+    }
 
 
 }

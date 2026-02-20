@@ -3,15 +3,13 @@ package com.project.store.controller;
 import com.project.store.domain.user.request.UserRequest;
 import com.project.store.domain.user.response.UserResponse;
 import com.project.store.service.UserService;
-import com.project.store.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -28,6 +26,25 @@ public class UserController {
         UserResponse userResponse = userService.createUserService(userRequest);
 
         return new ResponseEntity <>(userResponse, HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/myProfile")
+    public ResponseEntity<UserResponse> getMyProfile(Authentication authentication)
+    {
+
+        if (authentication != null || authentication.isAuthenticated()) {
+
+           String email= authentication.getName();
+
+          UserResponse userResponse= userService.getUserByEmailIdService(email);
+
+          return new ResponseEntity <>(userResponse,HttpStatus.OK);
+        }
+
+        return new ResponseEntity <>(HttpStatus.UNAUTHORIZED);
+
+
     }
 
 }
