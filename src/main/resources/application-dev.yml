@@ -14,3 +14,6 @@ jwt:
   secret:
     key: thisissimplesecetkeybyrahulsanjayabasutkaryesyesyesyesyeysnanankhhrhjjjddhjeke
 
+admin:
+  register:
+    secret: mySuperSecretKey123
