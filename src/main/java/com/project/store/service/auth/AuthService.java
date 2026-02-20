@@ -1,4 +1,4 @@
-package com.project.store.service;
+package com.project.store.service.auth;
 
 import com.project.store.domain.user.auth.response.AuthResponse;
 import com.project.store.domain.user.auth.request.AuthRequest;

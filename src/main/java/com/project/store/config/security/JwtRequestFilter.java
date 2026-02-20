@@ -1,7 +1,7 @@
 package com.project.store.config.security;
 
 
-import com.project.store.service.AppUserDetailsService;
+import com.project.store.service.auth.AppUserDetailsService;
 import com.project.store.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

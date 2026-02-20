@@ -2,7 +2,7 @@ package com.project.store.config.security;
 
 import com.project.store.config.handler.CustomAccessDeniedHandler;
 import com.project.store.config.handler.CustomAuthenticationEntryPoint;
-import com.project.store.service.AppUserDetailsService;
+import com.project.store.service.auth.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

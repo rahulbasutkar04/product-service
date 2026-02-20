@@ -1,18 +1,14 @@
-package com.project.store.controller;
+package com.project.store.controller.auth;
 
 import com.project.store.domain.user.auth.response.AuthResponse;
 import com.project.store.domain.user.auth.request.AuthRequest;
-import com.project.store.service.AuthService;
+import com.project.store.service.auth.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
 
 @RequestMapping("/auth")
 @RestController

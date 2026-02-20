@@ -1,8 +1,8 @@
-package com.project.store.controller;
+package com.project.store.controller.user;
 
 import com.project.store.domain.user.request.UserRequest;
 import com.project.store.domain.user.response.UserResponse;
-import com.project.store.service.UserService;
+import com.project.store.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/myProfile")
+    @GetMapping("/myProfile/secure")
     public ResponseEntity<UserResponse> getMyProfile(Authentication authentication)
     {
 

@@ -1,4 +1,4 @@
-package com.project.store.service;
+package com.project.store.service.user;
 
 import com.project.store.domain.user.request.UserRequest;
 import com.project.store.domain.user.response.UserResponse;

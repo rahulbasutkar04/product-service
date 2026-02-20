@@ -21,7 +21,8 @@ public enum ErrorResponseEnum {
     AUTHENTICATION_FAILED(130, "Authorization Failed!", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED_SERVER_ACCESS(131, "Unauthorized Server Access!", HttpStatus.FORBIDDEN),
     INVALID_REQUEST(135, "Invalid request!", HttpStatus.BAD_REQUEST),
-    UNAUTHORIZED(136,"UnAuthorized Access",HttpStatus.UNAUTHORIZED );
+    UNAUTHORIZED(136,"UnAuthorized Access",HttpStatus.UNAUTHORIZED ),
+    DUPLICATE_REQUEST(137,"Duplicate Request!", HttpStatus.CONFLICT );
 
 
     private final int code;

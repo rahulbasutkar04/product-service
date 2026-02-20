@@ -1,4 +1,4 @@
-package com.project.store.service.impl;
+package com.project.store.service.user.impl;
 
 import com.project.store.domain.user.User;
 import com.project.store.domain.user.UserRole;
@@ -9,7 +9,7 @@ import com.project.store.exception.ValidationError;
 import com.project.store.exception.ValidationErrorType;
 import com.project.store.exception.ValidationException;
 import com.project.store.repository.UserRepository;
-import com.project.store.service.UserService;
+import com.project.store.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
