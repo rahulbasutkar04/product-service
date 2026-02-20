@@ -1,6 +1,5 @@
 package com.project.store.domain.user;
 
-import com.project.store.util.user.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

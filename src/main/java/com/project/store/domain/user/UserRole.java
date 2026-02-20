@@ -1,4 +1,4 @@
-package com.project.store.util.user;
+package com.project.store.domain.user;
 
 public enum UserRole {
     ROLE_USER,

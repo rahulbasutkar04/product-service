@@ -1,2 +1,16 @@
 server:
   port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/zest_india_task
+    username: root
+    password: rahul
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret:
+    key: thisissimplesecetkeybyrahulsanjayabasutkaryesyesyesyesyeysnanankhhrhjjjddhjeke
+
