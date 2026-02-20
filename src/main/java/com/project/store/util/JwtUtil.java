@@ -20,22 +20,26 @@ public class JwtUtil {
 
     public String generateToken(UserDetails userDetails) {
 
-        Map <String, Object> claims = new HashMap <>();
+        Map<String, Object> claims = new HashMap<>();
 
-        return createToken(claims, userDetails.getUsername());
+        return createToken(
+                claims,
+                userDetails.getUsername(),
+                15 * 60 * 1000   // 15 minutes
+        );
     }
 
-    private String createToken(Map <String, Object> claims, String email) {
-
+    private String createToken(Map<String, Object> claims,
+                               String email,
+                               long expiry) {
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))// 10 hr expiration
+                .setExpiration(new Date(System.currentTimeMillis() + expiry))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
-
     }
 
 
@@ -77,6 +81,16 @@ public class JwtUtil {
         return (email.equals(userDetails.getUsername()) && ! isTokenExpired(token));
     }
 
+    public String generateRefreshToken(UserDetails userDetails) {
+
+        Map<String, Object> claims = new HashMap<>();
+
+        return createToken(
+                claims,
+                userDetails.getUsername(),
+                7 * 24 * 60 * 60 * 1000   // 7 days
+        );
+    }
 
 }
 

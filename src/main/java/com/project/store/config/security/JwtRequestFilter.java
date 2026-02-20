@@ -26,7 +26,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 
     private static final List<String> PUBLIC_URLS = List.of(
-            "/**/register/opn"
+            "/**/register/opn",
+            "/auth/login/opn"
     );
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();

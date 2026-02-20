@@ -50,9 +50,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // PUBLIC REGISTER APIs
-                        .requestMatchers("/**/register/opn").permitAll()
+                        .requestMatchers("/**/register/opn",
+                                "/auth/login/opn"
+                        ).permitAll()
 
-                        // 🔐 Everything Else Secured
+                        //  Everything Else Secured
                         .anyRequest().authenticated()
                 )
 
