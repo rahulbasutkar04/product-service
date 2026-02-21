@@ -1,205 +1,145 @@
 # Product Service
 
-A Spring Boot REST API for a **store** that manages **products** and **items**. It supports two roles: **User** (consumer) and **Admin** (product management). Authentication is JWT-based.
+A REST API for a store: manage **products** (catalog) and **items** (e.g. cart/wishlist). Two roles: **User** (shopper) and **Admin** (manage catalog). Secured with JWT.
+
+**Tech:** Java 17 · Spring Boot 3 · Spring Security (JWT) · MySQL · Swagger/OpenAPI
 
 ---
 
-## Table of Contents
+## Quick start (try it in 2 minutes)
 
-- [Initial Analysis / Project Overview](#initial-analysis--project-overview)
-- [How to Use the APIs (Flow)](#how-to-use-the-apis-flow)
-- [Authentication](#authentication)
-- [API Reference](#api-reference)
-- [Swagger / OpenAPI](#swagger--openapi)
-- [Docker](#docker)
-- [Local Setup](#local-setup)
+If you have [Docker](https://docs.docker.com/get-docker/) installed:
 
----
+```bash
+docker-compose up -d
+```
 
-## Initial Analysis / Project Overview
+Then open:
 
-This service covers the following **domains**:
+- **API (Swagger UI):** [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)
+- **Base URL:** http://localhost:8081
 
-| Domain | Description |
-|--------|-------------|
-| **User** | End customers who register, log in, view available products, and add items (e.g. to a cart/wishlist). Role: `USER`. |
-| **Admin** | Back-office users who register (with a secret), manage product catalog (CRUD), and view items by product. Role: `ADMIN`. |
-| **Product** | Catalog entities with name, category, quantity, and availability. Created/updated/deleted by admins; users see only available products. |
-| **Item** | User-added entries linking a product and quantity. Users add items and list their own; admins can list items by product. |
-| **Auth** | Login returns JWT access and refresh tokens. All non-public APIs require a valid JWT. |
-
-**Tech stack:** Java 17, Spring Boot 3.x, Spring Security (JWT), Spring Data JPA, hibernate, MySQL (dev), Springdoc OpenAPI (Swagger).
+To stop: `docker-compose down`
 
 ---
 
-## How to Use the APIs (Flow)
+## Table of contents
 
-To use the APIs (except the few public ones), **every user or admin must be registered and then log in** to obtain a JWT.
+| Section | What you'll find |
+|--------|-------------------|
+| [What is this?](#what-is-this) | Overview and main concepts |
+| [How to use the API](#how-to-use-the-api) | Register → Login → Call APIs (simple flow) |
+| [Authentication](#authentication) | How JWT works and which endpoints are public |
+| [Running the service](#running-the-service) | Docker Compose, Docker only, or local dev |
+| [API reference](#api-reference) | All endpoints with method, path, and access |
+| [Swagger](#swagger) | Interactive docs and OpenAPI link |
 
-1. **Register**
-   - **As User:** `POST /user/register/opn` with name, email, contact, password.
-   - **As Admin:** `POST /admin/register/opn` with the same body **plus** header `X-ADMIN-SECRET: <admin.register.secret>` (value from config).
+---
 
-2. **Login**
-   - **Anyone (user or admin):** `POST /auth/login/opn` with `email` and `password`. Response includes `token` (access) and `refreshToken`.
+## What is this?
 
-3. **Call secured APIs**
-   - Send the **access token** in the **Authorization** header: `Authorization: Bearer <token>` (or in a cookie named `jwt`).
-   - Use **user** endpoints only when logged in as `USER`; **admin** endpoints only when logged in as `ADMIN`.
+This service powers a **store** with:
 
-If the access token expires (see [Authentication](#authentication)), use the refresh token (e.g. in your client flow) or log in again to get a new pair.
+| Concept | Who uses it | What it does |
+|--------|--------------|--------------|
+| **User** | Shoppers | Register, login, see products, add items (e.g. to cart) |
+| **Admin** | Store staff | Register (with a secret), manage product catalog, view items by product |
+| **Product** | Catalog | Name, category, quantity, availability. Admins create/edit; users see only available ones |
+| **Item** | User’s list | Links a product + quantity. Users add/list their own; admins can list by product |
+
+Everything except registration and login requires a **JWT** (token) in the request.
+
+---
+
+## How to use the API
+
+In short: **register → login → send the token with every request.**
+
+### Step 1: Register
+
+- **As a user (shopper):**  
+  `POST /user/register/opn` with `name`, `email`, `contact`, `password`.
+- **As an admin:**  
+  Same body, but call `POST /admin/register/opn` and add header  
+  `X-ADMIN-SECRET: <value from config>`.
+
+### Step 2: Login
+
+- **Anyone:**  
+  `POST /auth/login/opn` with `email` and `password`.  
+  Response gives you `token` (access) and `refreshToken`.
+
+### Step 3: Call other APIs
+
+- Send the **access token** in every request:
+  - **Header:** `Authorization: Bearer <token>`
+  - Or **cookie:** `jwt=<token>`
+- Use **user** endpoints when logged in as User; **admin** endpoints when logged in as Admin.
+
+When the access token expires, use the refresh token (in your app flow) or log in again.
 
 ---
 
 ## Authentication
 
-- **Mechanism:** JWT (Bearer token). Token can be sent in:
-  - Header: `Authorization: Bearer <your-access-token>`
-  - Cookie: `jwt=<your-access-token>`
-- **Access token validity:** **15 minutes** (from issue time).
-- **Refresh token validity:** **7 days** (from issue time).
-- **Config:** Secret key is in `jwt.secret.key` (e.g. in `application-dev.yml`). For production, use env vars or a secrets manager; do not commit secrets.
+| Item | Detail |
+|------|--------|
+| **Type** | JWT (Bearer token) |
+| **Where to send** | Header `Authorization: Bearer <token>` or cookie `jwt=<token>` |
+| **Access token** | Valid for **15 minutes** |
+| **Refresh token** | Valid for **7 days** |
 
-**Public endpoints (no JWT):**
+**No token needed (public):**
 
-- `POST /user/register/opn` – user registration  
-- `POST /admin/register/opn` – admin registration (requires `X-ADMIN-SECRET`)  
-- `POST /auth/login/opn` – login  
+- `POST /user/register/opn` — user registration  
+- `POST /admin/register/opn` — admin registration (needs `X-ADMIN-SECRET`)  
+- `POST /auth/login/opn` — login  
 
-All other endpoints require a valid JWT and the correct role (USER or ADMIN) as indicated in the API reference below.
-
----
-
-## API Reference
-
-Base URL (local dev): `http://localhost:8081`
-
-### Auth
-
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `POST` | `/auth/login/opn` | Public | Login with email and password. Returns access + refresh tokens. |
-
-**Request body (JSON):**
-
-```json
-{
-  "email": "user@example.com",
-  "password": "min 6 chars"
-}
-```
-
-**Response:** `email`, `token` (access), `refreshToken`.
+All other endpoints need a valid JWT and the right role (USER or ADMIN).
 
 ---
 
-### User (registration & profile)
+## Running the service
 
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `POST` | `/user/register/opn` | Public | Register a new **user** (role USER). |
-| `GET`  | `/user/myProfile/secure` | **USER** | Get current user profile. |
+### Option 1: Docker Compose (easiest)
 
-**Register request body (JSON):**
+Runs the app **and** MySQL. No need to install Java or MySQL.
 
-- `name` (required), `email` (required, valid email), `contact` (required, 10-digit Indian mobile), `password` (required, min 6 chars).
+**Prerequisite:** [Docker](https://docs.docker.com/get-docker/) installed.
 
-**Profile response:** `name`, `email`, `contact`, `role`.
+| What you want | Command |
+|---------------|--------|
+| Start app + DB | `docker-compose up -d` |
+| Stop everything | `docker-compose down` |
+| Rebuild after code changes | `docker-compose up -d --build` |
+| View logs | `docker-compose logs -f` or `docker-compose logs -f app` |
+| See running containers | `docker-compose ps` |
 
----
-
-### Admin (registration only)
-
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `POST` | `/admin/register/opn` | Public* | Register a new **admin** (role ADMIN). *Requires header `X-ADMIN-SECRET` matching `admin.register.secret`. |
-
-**Request:** Same body as user registration. Header: `X-ADMIN-SECRET: <secret>`.
-
-**Response:** Same as user registration (includes `role: ADMIN`).
+Then use: **http://localhost:8081** and **http://localhost:8081/swagger-ui.html**.
 
 ---
 
-### Products (`/api/v1/product`)
+### Option 2: Docker (app only)
 
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `POST`   | `/api/v1/product/secure` | **ADMIN** | Create a product. |
-| `PUT`    | `/api/v1/product/{id}/secure` | **ADMIN** | Update product by id. |
-| `GET`    | `/api/v1/product/{id}/secure` | **ADMIN** | Get product by id (full details). |
-| `GET`    | `/api/v1/product/page/secure` | **ADMIN** | List all products with pagination; optional `category` filter. |
-| `DELETE` | `/api/v1/product/{id}/secure` | **ADMIN** | Soft-delete (make unavailable) product by id. |
-| `GET`    | `/api/v1/product/consumer/secure` | **USER** | List **available** products with pagination; optional `category` filter. |
+Use this if MySQL is already running (e.g. on your machine or another container).
 
-**Create product body (JSON):**
-
-- `productName` (required), `category` (required: `CLOTH`, `ELECTRONICS`, `TOY`, `HOUSEHOLD`, `DAILY_ESSENTIALS`), `productQuantity` (required, ≥ 0), `availability` (boolean).
-
-**Update product body (JSON):** All optional – `productName`, `productQuantity`, `category`, `availability`.
-
-**Pagination:** Use Spring `Pageable` (e.g. `?page=0&size=10`). Filter: `?category=ELECTRONICS`.
-
----
-
-### Items (`/api/v1/item`)
-
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| `POST` | `/api/v1/item/secure` | **USER** | Add an item (product + quantity) for the logged-in user. |
-| `GET`  | `/api/v1/item/secure` | **USER** | Get all items added by the logged-in user. |
-| `GET`  | `/api/v1/item/product/{productId}/secure` | **ADMIN** | Get all items for a given product. |
-
-**Add item body (JSON):**
-
-- `productId` (required), `quantity` (required, ≥ 1).
-
-**Item response fields:** `itemId`, `productId`, `productName`, `quantity`.
-
----
-
-## Swagger / OpenAPI
-
-Interactive API documentation is available when the application is running:
-
-- **Swagger UI:** [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)  
-- **OpenAPI JSON:** [http://localhost:8081/v3/api-docs](http://localhost:8081/v3/api-docs)  
-
-Swagger and API-docs endpoints are **public** (no JWT required to open the UI). You can use the “Authorize” button in Swagger UI to set `Bearer <your-access-token>` and then try secured endpoints.
-
----
-
-## Docker
-
-You can run the service in Docker so readers can try it without a full local Java/MySQL setup.
-
-### Prerequisites
-
-- [Docker](https://docs.docker.com/get-docker/) installed and running.
-
-### Build
-
-From the project root:
+**Build:**
 
 ```bash
 docker build -t product-service:latest .
 ```
 
-### Run
+**Run** (examples):
 
-- **App only (DB must be reachable from container):**
-
+- App only (DB must be reachable from container):
   ```bash
   docker run -p 8081:8081 --name product-service product-service:latest
   ```
-
-- **DB on host (e.g. MySQL on `localhost:3306`):**
-
+- DB on your host (e.g. MySQL on `localhost:3306`):
   ```bash
   docker run -p 8081:8081 --name product-service --add-host=host.docker.internal:host-gateway -e SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/zest_india_task product-service:latest
   ```
-
-- **With env overrides (DB URL, user, password, JWT secret):**
-
+- With custom DB and JWT (env overrides):
   ```bash
   docker run -p 8081:8081 --name product-service \
     -e SPRING_PROFILES_ACTIVE=dev \
@@ -210,58 +150,115 @@ docker build -t product-service:latest .
     product-service:latest
   ```
 
-- **Run in background:** add `-d` before `-p`.
+**Useful commands:**  
+`docker stop product-service` · `docker start product-service` · `docker logs -f product-service` · `docker rm -f product-service`
 
-After starting, use:
-
-- **Application:** http://localhost:8081  
-- **Swagger UI:** http://localhost:8081/swagger-ui.html  
-
-**Useful commands:**
-
-| Action | Command |
-|--------|---------|
-| Stop | `docker stop product-service` |
-| Start again | `docker start product-service` |
-| Remove container | `docker rm -f product-service` |
-| View logs | `docker logs -f product-service` |
-
-For more detail (e.g. production notes), see [DOCKER.md](DOCKER.md).
+More details: [DOCKER.md](DOCKER.md).
 
 ---
 
-## Local Setup
+### Option 3: Local (no Docker)
 
-For development without Docker:
+**Prerequisites:** Java 17, MySQL (e.g. 8.x), Gradle (or `./gradlew` / `gradlew.bat`).
 
-1. **Prerequisites**
-   - **Java 17**
-   - **MySQL** (e.g. 8.x) with a database (e.g. `zest_india_task`)
-   - **Gradle** (or use the wrapper: `./gradlew` / `gradlew.bat`)
+1. **Configure**  
+   Edit `src/main/resources/application-dev.yml`: set DB URL, username, password, `jwt.secret.key`, and `admin.register.secret`.
 
-2. **Configuration**
-   - Copy or edit `src/main/resources/application-dev.yml` and set:
-     - `spring.datasource.url`, `username`, `password` for your MySQL instance.
-     - `jwt.secret.key` (secure random string for production).
-     - `admin.register.secret` (used for `X-ADMIN-SECRET` when registering admins).
+2. **Run**  
+   `./gradlew bootRun --args='--spring.profiles.active=dev'`  
+   Or run `ProductServiceApplication` with profile `dev`.
 
-3. **Run**
-   - With Gradle: `./gradlew bootRun --args='--spring.profiles.active=dev'`  
-   - Or run the main class `ProductServiceApplication` with profile `dev`.
+3. **Port**  
+   App runs on **8081**.
 
-4. **Port**
-   - Default dev port: **8081**.
+4. **Check**  
+   Open http://localhost:8081/swagger-ui.html → register → login → use “Authorize” with the token → try the APIs.
 
-5. **Verify**
-   - Open http://localhost:8081/swagger-ui.html and try:
-     - Register user → Login → Use “Authorize” with the returned token → Call user/product/item APIs as per the table above.
+---
+
+## API reference
+
+**Base URL (local):** `http://localhost:8081`
+
+### Auth
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| `POST` | `/auth/login/opn` | Public | Login; returns `token` and `refreshToken`. |
+
+**Body:** `{ "email": "...", "password": "..." }`  
+**Response:** `email`, `token`, `refreshToken`.
+
+---
+
+### User (registration & profile)
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| `POST` | `/user/register/opn` | Public | Register a user (role USER). |
+| `GET`  | `/user/myProfile/secure` | USER | Get current user profile. |
+
+**Register body:** `name`, `email`, `contact` (10-digit mobile), `password` (min 6 chars).  
+**Profile response:** `name`, `email`, `contact`, `role`.
+
+---
+
+### Admin (registration)
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| `POST` | `/admin/register/opn` | Public* | Register an admin (role ADMIN). *Header: `X-ADMIN-SECRET`. |
+
+Same body as user registration; response includes `role: ADMIN`.
+
+---
+
+### Products (`/api/v1/product`)
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| `POST`   | `/api/v1/product/secure` | ADMIN | Create product. |
+| `PUT`    | `/api/v1/product/{id}/secure` | ADMIN | Update product. |
+| `GET`    | `/api/v1/product/{id}/secure` | ADMIN | Get product by id. |
+| `GET`    | `/api/v1/product/page/secure` | ADMIN | List all (paginated; optional `?category=...`). |
+| `DELETE` | `/api/v1/product/{id}/secure` | ADMIN | Soft-delete (set unavailable). |
+| `GET`    | `/api/v1/product/consumer/secure` | USER | List **available** products (paginated; optional `?category=...`). |
+
+**Create body:** `productName`, `category` (CLOTH, ELECTRONICS, TOY, HOUSEHOLD, DAILY_ESSENTIALS), `productQuantity`, `availability`.  
+**Pagination:** `?page=0&size=10`.
+
+---
+
+### Items (`/api/v1/item`)
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| `POST` | `/api/v1/item/secure` | USER | Add item (product + quantity). |
+| `GET`  | `/api/v1/item/secure` | USER | List current user’s items. |
+| `GET`  | `/api/v1/item/product/{productId}/secure` | ADMIN | List items for a product. |
+
+**Add body:** `productId`, `quantity` (≥ 1).  
+**Response fields:** `itemId`, `productId`, `productName`, `quantity`.
+
+---
+
+## Swagger
+
+When the app is running:
+
+- **Swagger UI (try the API in the browser):** [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)
+- **OpenAPI JSON:** [http://localhost:8081/v3/api-docs](http://localhost:8081/v3/api-docs)
+
+Swagger is public (no login to open the page). Use **Authorize** to paste your `Bearer <token>` and call secured endpoints.
 
 ---
 
 ## Summary
 
-- **Flow:** Register (user or admin) → Login → Use APIs with the JWT.
-- **Access:** Each API is either Public, **USER** only, or **ADMIN** only, as in the tables.
-- **Auth:** Access token 15 minutes; refresh token 7 days; send token as `Authorization: Bearer <token>` or cookie `jwt`.
-- **Docs:** Swagger at `/swagger-ui.html`; OpenAPI at `/v3/api-docs`.
-- **Run:** Via Docker (see [Docker](#docker)) or local Java 17 + MySQL (see [Local Setup](#local-setup)).
+| Topic | Summary |
+|--------|---------|
+| **Flow** | Register (user or admin) → Login → Call APIs with JWT. |
+| **Token** | Access token 15 min; refresh 7 days. Send as `Authorization: Bearer <token>` or cookie `jwt`. |
+| **Roles** | Endpoints are Public, **USER** only, or **ADMIN** only (see tables above). |
+| **Run** | **Recommended:** `docker-compose up -d`. Or [Docker only](#option-2-docker-app-only) or [local](#option-3-local-no-docker). |
+| **Docs** | Swagger at `/swagger-ui.html`; OpenAPI at `/v3/api-docs`. |

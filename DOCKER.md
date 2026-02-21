@@ -5,7 +5,32 @@
 
 ---
 
-## 1. Build the image
+## 0. Quick start with Docker Compose (app + MySQL)
+
+From the project root:
+
+```bash
+docker-compose up -d
+```
+
+This starts MySQL and the product-service app. The app waits for MySQL to be healthy before starting.
+
+- **Application:** http://localhost:8081  
+- **Swagger UI:** http://localhost:8081/swagger-ui.html  
+
+**Docker Compose commands:**
+
+| Action | Command |
+|--------|---------|
+| Start (detached) | `docker-compose up -d` |
+| Stop and remove | `docker-compose down` |
+| Rebuild and start | `docker-compose up -d --build` |
+| View logs | `docker-compose logs -f` or `docker-compose logs -f app` |
+| List services | `docker-compose ps` |
+
+---
+
+## 1. Build the image (manual run)
 
 From the project root (where `Dockerfile` and `build.gradle` are):
 
@@ -55,7 +80,7 @@ docker run -d -p 8081:8081 --name product-service product-service:latest
 
 ---
 
-## 3. Useful commands
+## 3. Useful commands (manual single-container run)
 
 | Action        | Command |
 |---------------|--------|
@@ -64,6 +89,8 @@ docker run -d -p 8081:8081 --name product-service product-service:latest
 | Remove container | `docker rm -f product-service` |
 | View logs     | `docker logs -f product-service` |
 | Shell into container | `docker exec -it product-service sh` |
+
+For Docker Compose commands, see [Quick start with Docker Compose](#0-quick-start-with-docker-compose-app--mysql) above.
 
 ---
 
