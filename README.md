@@ -19,6 +19,8 @@ Then open:
 - **API (Swagger UI):** [http://localhost:8081/swagger-ui.html](http://localhost:8081/swagger-ui.html)
 - **Base URL:** http://localhost:8081
 
+You can also try all APIs using the **Postman collection** (see [Trying the API with Postman](#trying-the-api-with-postman)).
+
 To stop: `docker-compose down`
 
 ---
@@ -30,6 +32,7 @@ To stop: `docker-compose down`
 | [What is this?](#what-is-this) | Overview and main concepts |
 | [How to use the API](#how-to-use-the-api) | Register → Login → Call APIs (simple flow) |
 | [Authentication](#authentication) | How JWT works and which endpoints are public |
+| [Trying the API with Postman](#trying-the-api-with-postman) | Import the collection, set env, auto token after login |
 | [Running the service](#running-the-service) | Docker Compose, Docker only, or local dev |
 | [API reference](#api-reference) | All endpoints with method, path, and access |
 | [Swagger](#swagger) | Interactive docs and OpenAPI link |
@@ -96,6 +99,55 @@ When the access token expires, use the refresh token (in your app flow) or log i
 - `POST /auth/login/opn` — login  
 
 All other endpoints need a valid JWT and the right role (USER or ADMIN).
+
+---
+
+## Trying the API with Postman
+
+A **Postman collection** is included so you can hit every API from Postman without building requests by hand. The collection uses **environment variables** and a **script** that automatically saves your login token.
+
+### File
+
+- **`Zest India Assignment.postman_collection.json`** (in the project root)
+
+### What the collection contains
+
+| Feature | Description |
+|--------|-------------|
+| **Environment variables** | `baseUrl` — API base URL (e.g. `http://localhost:8081`). Optional: `usertoken` and `refreshToken` (usually left blank; the Login request sets them for you). |
+| **Auto token script** | The **Login User** request has a **Test** script that runs after a successful login. It reads the response JSON and saves `token` → `usertoken` and `refreshToken` → `refreshToken` in your active environment. All other secured requests use **Bearer token** `{{usertoken}}`, so once you log in, you don’t need to copy-paste the token. |
+| **Folders** | **Admin** (Product CRUD, Items by product, Admin register), **User** (User register, My profile, Consumer products, Items), and **Login User** (login with script). |
+| **Sample requests** | Example bodies and (where relevant) saved example responses (success, validation error, unauthorized, etc.). |
+
+### How to import and use
+
+1. **Install Postman**  
+   [postman.com/downloads](https://www.postman.com/downloads) if you don’t have it.
+
+2. **Import the collection**  
+   In Postman: **File → Import** (or drag-and-drop), choose **`Zest India Assignment.postman_collection.json`**, then **Import**.
+
+3. **Create an environment**  
+   - **Environments** (left sidebar or **Environments** tab) → **Create** (or **+**).  
+   - Add a variable: **Variable:** `baseUrl`, **Initial value:** `http://localhost:8081` (or your server URL).  
+   - Save (e.g. name it “Product Service Local”).  
+   - You can leave `usertoken` and `refreshToken` empty; the Login request will set them.
+
+4. **Select the environment**  
+   In the top-right dropdown, select the environment you just created (e.g. “Product Service Local”).
+
+5. **Run Login first**  
+   Open **Login User** → **Login User** (or the single login request).  
+   - Set the request body to your credentials (`email`, `password`).  
+   - Click **Send**.  
+   - On success, the script saves the access and refresh tokens into the environment. You can confirm in **Environments** → your env → **Current value** for `usertoken`.
+
+6. **Call other APIs**  
+   Use any request under **Admin** or **User**. They already use **Authorization: Bearer {{usertoken}}**, so no need to paste the token manually.  
+   - For **admin** endpoints, use an admin account (register via **Admin → Admin register** with `X-ADMIN-SECRET` first if needed).  
+   - For **user** endpoints, use a user account (register via **User → User register**).
+
+**Tip:** If you get **401 Unauthorized**, run **Login User** again; the access token expires after 15 minutes.
 
 ---
 
@@ -261,4 +313,5 @@ Swagger is public (no login to open the page). Use **Authorize** to paste your `
 | **Token** | Access token 15 min; refresh 7 days. Send as `Authorization: Bearer <token>` or cookie `jwt`. |
 | **Roles** | Endpoints are Public, **USER** only, or **ADMIN** only (see tables above). |
 | **Run** | **Recommended:** `docker-compose up -d`. Or [Docker only](#option-2-docker-app-only) or [local](#option-3-local-no-docker). |
+| **Try APIs** | [Swagger](#swagger) in the browser, or [Postman collection](#trying-the-api-with-postman) (`Zest India Assignment.postman_collection.json`) with auto token after login. |
 | **Docs** | Swagger at `/swagger-ui.html`; OpenAPI at `/v3/api-docs`. |
